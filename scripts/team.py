@@ -1,0 +1,15 @@
+
+
+class Team:
+    def __init__(self, team_name, abbreviation = None, strategy = None):
+        self.team_name = team_name
+        if abbreviation == None:
+            self.abbreviation = self.team_name[:3].upper()
+        else:
+            # cap team name abbreviations at three characters
+            self.abbreviation = abbreviation[:3]
+        self.strategy = strategy
+        self.num_wins = 0
+        self.num_losses = 0
+    def __repr__(self):
+        return str(self.team_name)
