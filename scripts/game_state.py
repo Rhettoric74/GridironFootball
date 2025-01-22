@@ -57,6 +57,17 @@ class GameState:
         self.distance = 0
         self.down_counter = 0
         self.down = "kickoff"
+    def update_records(self):
+        if self.game_is_over:
+            if self.away_score > self.home_score:
+                self.away_team.num_wins += 1
+                self.home_team.num_losses += 1
+            elif self.home_score > self.away_score:
+                self.home_team.num_wins += 1
+                self.away_team.num_losses += 1
+            else:
+                self.home_team.num_ties += 1
+                self.away_team.num_ties += 1
     def update_state(self, yardage, turnover = False, two_point_try = False, is_kick_good = None, time_elapsed = 0.5, punt = False):
         if self.game_is_over:
             return
@@ -135,7 +146,6 @@ class GameState:
             else:
                 self.distance -= yardage
                 self.down_counter += 1
-                print(self.down_counter)
                 if self.down_counter <= 4:
                     self.down = downs_map[self.down_counter]
                 else:
@@ -166,6 +176,7 @@ class GameState:
             if self.current_quarter == 5:
                 print("Game over")
                 self.game_is_over = True
+                self.update_records()
         if self.yard_line >= 100:
             if self.team_with_posession == self.home_team:
                 print(self.home_team.abbreviation + " touchdown!")
@@ -183,6 +194,7 @@ class GameState:
             if self.current_quarter == 5:
                 print("Game over")
                 self.game_is_over = True
+                self.update_records()
         if time_elapsed >= self.time_remaining:
             if self.current_quarter == 4:
                 print("End of regulation")
@@ -192,9 +204,11 @@ class GameState:
                     self.time_remaining = self.quarter_length
                 else:
                     self.game_is_over = True
+                    self.update_records()
             elif self.current_quarter == 5:
                 print("End of overtime!")
                 self.game_is_over = True
+                self.update_records()
             else:
                 self.current_quarter += 1
                 self.time_remaining = self.quarter_length

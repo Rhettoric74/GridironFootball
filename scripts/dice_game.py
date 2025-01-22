@@ -1,5 +1,6 @@
 from team import Team
 import game_state
+from game_simulator import GameSimulator
 import random
 import numpy as np
 import time
@@ -29,7 +30,7 @@ def check_for_doubles(rolls):
         if count == 2:
             return number
     return -1
-class DiceGame:
+class DiceGame(GameSimulator):
     def __init__(self, home_team, away_team, dice_number = 2, offensive_dice_faces = 10, defensive_dice_faces = 6):
         self.home_team = home_team
         self.away_team = away_team
@@ -72,7 +73,7 @@ class DiceGame:
     def kick_pat(self):
         kick = random.randint(1, 10) > 1
         self.game_state.update_state(0, is_kick_good=kick)
-    def simulate_game(self):
+    def simulate_game(self, turn_time = 0):
         while not self.game_state.game_is_over:
             if self.game_state.down == "kickoff":
                 self.kickoff()
@@ -87,9 +88,9 @@ class DiceGame:
                 self.kick_pat()
             print(self.game_state)
             print()
-            time.sleep(1)
+            time.sleep(turn_time)
 if __name__ == '__main__':
-    game = DiceGame(Team("Minnesota"), Team("Green Bay", "GB"))
+    game = DiceGame(Team("Minnesota"), Team("Green Bay", "GB"), dice_number = 2, offensive_dice_faces=12, defensive_dice_faces=8)
     game.simulate_game()
     print(game.game_state)
 
