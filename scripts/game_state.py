@@ -10,6 +10,8 @@ class GameState:
         self.away_team = away_team
         self.home_score = 0
         self.away_score = 0
+        self.home_yards = 0
+        self.away_yards = 0
         self.coin_toss_winner = random.choice([self.home_team, self.away_team])
         self.team_with_posession = self.coin_toss_winner
         self.down = "kickoff"
@@ -70,9 +72,14 @@ class GameState:
                 self.away_team.num_ties += 1
             # record the scores of the game in the team objects
             self.away_team.points_for.append(self.away_score)
+            self.away_team.yards_for.append(self.away_yards)
             self.away_team.points_allowed.append(self.home_score)
+            self.away_team.yards_allowed.append(self.home_yards)
+
             self.home_team.points_for.append(self.home_score)
+            self.home_team.yards_for.append(self.home_yards)
             self.home_team.points_allowed.append(self.away_score)
+            self.home_team.yards_allowed.append(self.away_yards)
 
     def update_state(self, yardage, turnover = False, two_point_try = False, is_kick_good = None, time_elapsed = 0.5, punt = False):
         if self.game_is_over:
@@ -142,8 +149,12 @@ class GameState:
         elif turnover == False:
             if self.team_with_posession == self.home_team:
                 self.yard_line += yardage
+                # for plays from scrimmage, add yardage, keeping the distance to a
+                # touchdown as the maximum
+                self.home_yards += min(yardage, self.yards_to_goal())
             else:
                 self.yard_line -= yardage
+                self.away_yards += min(yardage, self.yards_to_goal())
             if yardage >= self.distance:
                 print(self.team_with_posession.abbreviation + " first down!")
                 self.down = "1st"

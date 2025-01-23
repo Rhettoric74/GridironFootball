@@ -15,10 +15,11 @@ def load_teams_from_csv(filepath = "data/nfl_teams.csv"):
         return teams_list
 
 class League:
-    def __init__(self, teams = load_teams_from_csv()):
+    def __init__(self, teams = load_teams_from_csv(), simulator = DiceGame):
         self.teams = teams
         self.conferences = list(set([team.conference for team in self.teams]))
         self.divisions = list(set([team.conference + " " + team.division for team in self.teams]))
+        self.simulator = simulator
     def play_round_robin(self):
         played_already = set()
         for team in self.teams:
@@ -27,12 +28,14 @@ class League:
                 if other_team not in played_already:
                     team.schedule.append(other_team)
                     other_team.schedule.append(team)
-                    DiceGame(team, other_team, 2, 10, 6).simulate_game()
+                    self.simulator(team, other_team).simulate_game()
     def list_records(self):
         self.teams.sort(key=lambda team: team.num_wins)
         for team in self.teams:
             print(str(team) + " " + str(team.num_wins) + "-" + str(team.num_losses) + "-"
-                   + str(team.num_ties) + ", points for: " + str(np.sum(team.points_for)) + " points allowed: " + str(np.sum(team.points_allowed)))
+                   + str(team.num_ties) + ", point per game: " + str(np.mean(team.points_for)) + " points allowed per game: " + str(np.mean(team.points_allowed)))
+            print("Yards per game: " + str(np.mean(team.yards_for)) + ". Yards allowed per game: " + str(np.mean(team.yards_allowed)))
+            print()
 
 
 

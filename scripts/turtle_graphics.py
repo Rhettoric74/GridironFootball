@@ -100,7 +100,7 @@ def draw_game_state(game_state, t):
     line_of_scrimmage = (game_state.yard_line - 50) * yard_line_spacing
     first_down_line = line_of_scrimmage + game_state.distance * yard_line_spacing
     if game_state.team_with_posession == game_state.away_team:
-        first_down_line = line_of_scrimmage + game_state.distance * yard_line_spacing
+        first_down_line = line_of_scrimmage - game_state.distance * yard_line_spacing
     t.color("black")
     draw_line(t, line_of_scrimmage, -field_width_scaled / 2, line_of_scrimmage, field_width_scaled / 2)
     t.color("yellow")

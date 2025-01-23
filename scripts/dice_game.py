@@ -97,9 +97,11 @@ class DiceGame(GameSimulator):
                 erase_game_state(self.game_state, turtle)
 if __name__ == '__main__':
     t, screen = draw_field()
-    game = DiceGame(Team("Minnesota"), Team("Green Bay", "GB"), dice_number = 2, offensive_dice_faces=12, defensive_dice_faces=8)
+    mn, gb = Team("Minnesota"), Team("Green Bay", "GB")
+    game = DiceGame(mn, gb, dice_number = 2, offensive_dice_faces=12, defensive_dice_faces=8)
     game.simulate_game(1, t)
     print(game.game_state)
+    print(gb.yards_for, gb.yards_allowed, mn.yards_for, mn.yards_allowed)
 
 
 
