@@ -4,6 +4,8 @@ from game_simulator import GameSimulator
 import random
 import numpy as np
 import time
+from turtle_graphics import draw_game_state, erase_game_state, draw_field
+
 def check_for_triples(rolls):
         """returns a number if the given list of rolls contains "triples".
         Returns negative 1 if there are no triples in the list."""  
@@ -73,7 +75,7 @@ class DiceGame(GameSimulator):
     def kick_pat(self):
         kick = random.randint(1, 10) > 1
         self.game_state.update_state(0, is_kick_good=kick)
-    def simulate_game(self, turn_time = 0):
+    def simulate_game(self, turn_time = 0, turtle = None):
         while not self.game_state.game_is_over:
             if self.game_state.down == "kickoff":
                 self.kickoff()
@@ -88,10 +90,15 @@ class DiceGame(GameSimulator):
                 self.kick_pat()
             print(self.game_state)
             print()
+            if turtle != None:
+                draw_game_state(self.game_state, turtle)
             time.sleep(turn_time)
+            if turtle != None:
+                erase_game_state(self.game_state, turtle)
 if __name__ == '__main__':
+    t, screen = draw_field()
     game = DiceGame(Team("Minnesota"), Team("Green Bay", "GB"), dice_number = 2, offensive_dice_faces=12, defensive_dice_faces=8)
-    game.simulate_game()
+    game.simulate_game(1, t)
     print(game.game_state)
 
 

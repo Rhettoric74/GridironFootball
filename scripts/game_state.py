@@ -68,6 +68,12 @@ class GameState:
             else:
                 self.home_team.num_ties += 1
                 self.away_team.num_ties += 1
+            # record the scores of the game in the team objects
+            self.away_team.points_for.append(self.away_score)
+            self.away_team.points_allowed.append(self.home_score)
+            self.home_team.points_for.append(self.home_score)
+            self.home_team.points_allowed.append(self.away_score)
+
     def update_state(self, yardage, turnover = False, two_point_try = False, is_kick_good = None, time_elapsed = 0.5, punt = False):
         if self.game_is_over:
             return

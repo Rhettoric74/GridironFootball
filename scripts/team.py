@@ -13,6 +13,8 @@ class Team:
         self.num_losses = 0
         self.num_ties = 0
         self.schedule = []
+        self.points_for = []
+        self.points_allowed = []
         self.division = division
         self.conference = conference
     def __repr__(self):

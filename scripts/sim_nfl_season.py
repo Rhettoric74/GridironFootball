@@ -2,6 +2,7 @@ from game_state import GameState
 from team import Team
 import csv
 from dice_game import DiceGame
+import numpy as np
 
 def load_teams_from_csv(filepath = "data/nfl_teams.csv"):
     with open(filepath) as fp:
@@ -24,11 +25,14 @@ class League:
             played_already.add(team)
             for other_team in self.teams:
                 if other_team not in played_already:
-                    DiceGame(team, other_team, 2).simulate_game()
+                    team.schedule.append(other_team)
+                    other_team.schedule.append(team)
+                    DiceGame(team, other_team, 2, 10, 6).simulate_game()
     def list_records(self):
         self.teams.sort(key=lambda team: team.num_wins)
         for team in self.teams:
-            print(str(team) + " " + str(team.num_wins) + "-" + str(team.num_losses) + "-" + str(team.num_ties))
+            print(str(team) + " " + str(team.num_wins) + "-" + str(team.num_losses) + "-"
+                   + str(team.num_ties) + ", points for: " + str(np.sum(team.points_for)) + " points allowed: " + str(np.sum(team.points_allowed)))
 
 
 
