@@ -43,7 +43,7 @@ def add_yard_numbers(t, field_length_scaled, field_width_scaled, yard_line_spaci
         # Add numbers at the top of the field
         t.goto(x, field_width_scaled / 2 + 5)
         t.write(50 - abs(i), align="center", font=font)
-def draw_field():
+def draw_field(home_team, away_team):
     # Initialize the turtle
     screen = turtle.Screen()
     screen.setup(width=800, height=600)
@@ -73,8 +73,8 @@ def draw_field():
         draw_line(t, x, -field_width_scaled / 2, x, field_width_scaled / 2)
 
     # Draw the end zones
-    t.color("blue")
-    t.fillcolor("lightblue")
+    t.color("white")
+    t.fillcolor(home_team.color)
     for x in [-field_length_scaled / 2, field_length_scaled / 2 - end_zone_length]:
         t.penup()
         t.goto(x, -field_width_scaled / 2)
@@ -85,6 +85,7 @@ def draw_field():
         t.goto(x, field_width_scaled / 2)
         t.goto(x, -field_width_scaled / 2)
         t.end_fill()
+        t.fillcolor(away_team.color)
 
     # Draw hash marks
     hash_mark_positions = [-field_width_scaled * (0.5 - 0.4421875), field_width_scaled * (0.5 - 0.4421875)]
@@ -99,7 +100,7 @@ def draw_field():
 def draw_game_state(game_state, t):
     line_of_scrimmage = (game_state.yard_line - 50) * yard_line_spacing
     first_down_line = line_of_scrimmage + game_state.distance * yard_line_spacing
-    if game_state.team_with_posession == game_state.away_team:
+    if game_state.team_with_possession == game_state.away_team:
         first_down_line = line_of_scrimmage - game_state.distance * yard_line_spacing
     t.color("black")
     draw_line(t, line_of_scrimmage, -field_width_scaled / 2, line_of_scrimmage, field_width_scaled / 2)
@@ -112,14 +113,16 @@ def draw_game_state(game_state, t):
     t.goto(0, field_width_scaled)
     t.write(description[0], align="center", font=font)
     t.penup()
+    t.color(game_state.team_with_possession.color)
     t.goto(0, -field_width_scaled)
     t.write(description[1], align="center", font=font)
     t.penup()
+    t.color("white")
     t.goto(0, -1.5 * field_width_scaled)
     t.write(description[2], align="center", font=font)
 
 def erase_game_state(game_state, t):
-    NUM_TURTLE_COMMANDS = 17
+    NUM_TURTLE_COMMANDS = 19
     for i in range(NUM_TURTLE_COMMANDS):
         t.undo()
 

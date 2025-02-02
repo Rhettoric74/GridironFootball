@@ -5,7 +5,7 @@ downs_map = {1:"1st", 2:"2nd", 3:"3rd", 4:"4th"}
 # constant for how many yards from the line of scrimmage kickers kick from
 FIELD_GOAL_HOLDING_DISTANCE = 8
 class GameState:
-    def __init__(self, home_team = Team("Home team"), away_team = Team("Away team"), quarter_length = 15):
+    def __init__(self, home_team = Team("Home team", color="black"), away_team = Team("Away team", color="white"), quarter_length = 15):
         self.home_team = home_team
         self.away_team = away_team
         self.home_score = 0
@@ -13,12 +13,12 @@ class GameState:
         self.home_yards = 0
         self.away_yards = 0
         self.coin_toss_winner = random.choice([self.home_team, self.away_team])
-        self.team_with_posession = self.coin_toss_winner
+        self.team_with_possession = self.coin_toss_winner
         self.down = "kickoff"
         self.down_counter = 0
         self.distance = 0
         self.yard_line = 35
-        if self.team_with_posession == self.away_team:
+        if self.team_with_possession == self.away_team:
             self.yard_line = 65
         self.quarter_length = quarter_length
         self.current_quarter = 1
@@ -32,29 +32,29 @@ class GameState:
         else:
             return "50"
     def yards_to_goal(self):
-        if self.home_team == self.team_with_posession:
+        if self.home_team == self.team_with_possession:
             return 100 - self.yard_line
         else:
             return self.yard_line
     def __repr__(self):
         if self.down != "kickoff":
             return (str(self.away_team) + " " + str(self.away_score) + " " + str(self.home_team) + " " + str(self.home_score) + "\n"
-                        + str(self.team_with_posession) + " ball at the " + self.describe_yard_line() + " " + self.down + " and " + str(self.distance)
+                        + str(self.team_with_possession) + " ball at the " + self.describe_yard_line() + " " + self.down + " and " + str(self.distance)
                         + "\n" + str(self.time_remaining) + " in quarter " + str(self.current_quarter))
         else:
             return (str(self.away_team) + " " + str(self.away_score) + " " + str(self.home_team) + " " + str(self.home_score) + "\n"
-                        + str(self.team_with_posession) + " kickoff from the " + self.describe_yard_line()
+                        + str(self.team_with_possession) + " kickoff from the " + self.describe_yard_line()
                         + "\n" + str(self.time_remaining) + " in quarter " + str(self.current_quarter))
     def switch_possession(self):
         teams = [self.home_team, self.away_team]
-        teams.remove(self.team_with_posession)
-        self.team_with_posession = teams[0]
+        teams.remove(self.team_with_possession)
+        self.team_with_possession = teams[0]
         self.down_counter = 1
         self.down = "1st"
         self.distance = 10
     def set_to_kickoff(self):
         self.yard_line = 35
-        if self.team_with_posession == self.away_team:
+        if self.team_with_possession == self.away_team:
             self.yard_line = 65
         self.distance = 0
         self.down_counter = 0
@@ -93,7 +93,7 @@ class GameState:
                 else:
                     # 1 point safety (never happened in NFL but in rules)
                     opponent_points_scored = 1
-            if self.team_with_posession == self.away_team:
+            if self.team_with_possession == self.away_team:
                 self.home_score += opponent_points_scored
             else:
                 self.away_score += opponent_points_scored
@@ -103,38 +103,38 @@ class GameState:
                     points_scored = 2
                 if not two_point_try and is_kick_good:
                     points_scored = 1
-                if self.team_with_posession == self.away_team:
+                if self.team_with_possession == self.away_team:
                     self.away_score += points_scored
                 else:
                     self.home_score += points_scored
             self.set_to_kickoff()
-        # case for field goals
         elif self.down == "kickoff":
             self.down = "1st"
             self.down_counter = 1
-            if self.team_with_posession == self.home_team:
+            if self.team_with_possession == self.home_team:
                 self.yard_line = 100 - yardage
             else:
                 self.yard_line = yardage
             if not turnover:
                 self.switch_possession()
+        # case for field goals
         elif is_kick_good != None:
             if is_kick_good:
-                if self.team_with_posession == self.home_team:
+                if self.team_with_possession == self.home_team:
                     self.home_score += 3
                 else:
                     self.away_score += 3
                 self.set_to_kickoff()
             else:
                 # missed field goal
-                if self.home_team == self.team_with_posession:
+                if self.home_team == self.team_with_possession:
                     self.yard_line -= 8
                 else:
                     self.yard_line += 8
                 self.switch_possession()
         elif punt == True:
             self.switch_possession()
-            if self.team_with_posession == self.home_team:
+            if self.team_with_possession == self.home_team:
                 self.yard_line -= yardage
             else:
                 self.yard_line += yardage
@@ -147,7 +147,7 @@ class GameState:
 
 
         elif turnover == False:
-            if self.team_with_posession == self.home_team:
+            if self.team_with_possession == self.home_team:
                 self.yard_line += yardage
                 # for plays from scrimmage, add yardage, keeping the distance to a
                 # touchdown as the maximum
@@ -156,7 +156,7 @@ class GameState:
                 self.yard_line -= yardage
                 self.away_yards += min(yardage, self.yards_to_goal())
             if yardage >= self.distance:
-                print(self.team_with_posession.abbreviation + " first down!")
+                print(self.team_with_possession.abbreviation + " first down!")
                 self.down = "1st"
                 self.down_counter = 1
                 self.distance = 10
@@ -170,17 +170,17 @@ class GameState:
                     self.switch_possession()
         else:
             print("Forced turnover!")
-            if self.team_with_posession == self.home_team:
+            if self.team_with_possession == self.home_team:
                 self.yard_line += yardage
             else:
                 self.yard_line -= yardage
             self.switch_possession()
         
         if self.yard_line <= 0:
-            if self.team_with_posession == self.away_team:
+            if self.team_with_possession == self.away_team:
                 print(self.away_team.abbreviation + " touchdown!")
                 self.away_score += 6
-                self.team_with_posession = self.away_team
+                self.team_with_possession = self.away_team
                 self.down = "PAT"
                 self.down_counter = 0
                 self.distance = 2
@@ -195,10 +195,10 @@ class GameState:
                 self.game_is_over = True
                 self.update_records()
         if self.yard_line >= 100:
-            if self.team_with_posession == self.home_team:
+            if self.team_with_possession == self.home_team:
                 print(self.home_team.abbreviation + " touchdown!")
                 self.home_score += 6
-                self.team_with_posession = self.home_team
+                self.team_with_possession = self.home_team
                 self.down = "PAT"
                 self.down_counter = 0
                 self.distance = 2
@@ -222,6 +222,16 @@ class GameState:
                 else:
                     self.game_is_over = True
                     self.update_records()
+            elif self.current_quarter == 2:
+                print("Halftime!")
+                # setup the second half kickoff
+                teams = [self.home_team, self.away_team]
+                teams.remove(self.coin_toss_winner)
+                self.team_with_possession = teams[0]
+                self.set_to_kickoff()
+                self.current_quarter += 1
+                self.time_remaining = self.quarter_length
+
             elif self.current_quarter == 5:
                 print("End of overtime!")
                 self.game_is_over = True

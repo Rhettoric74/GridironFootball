@@ -69,7 +69,7 @@ class DiceGame(GameSimulator):
         if self.game_state.yards_to_goal() <= 35:
             self.kick_field_goal()
         elif random.randint(1, 10) > self.game_state.distance + (self.game_state.yards_to_goal() // 10):
-            self.play_from_scrimmage
+            self.play_from_scrimmage()
         else:
             self.punt()
     def kick_pat(self):
@@ -80,10 +80,11 @@ class DiceGame(GameSimulator):
             if self.game_state.down == "kickoff":
                 self.kickoff()
             elif self.game_state.down_counter in [1, 2, 3]:
-                """ if self.game_state.current_quarter in [2, 4] and self.game_state.time_remaining <= 0.5 and self.game_state.away_score - self.game_state.home_score <= -3:
+                # conditions where you should attempt a field goal not on fourth down
+                if self.game_state.time_remaining <= 0.4 and self.game_state.current_quarter in [2, 4] and self.game_state.yards_to_goal() <= 35 and self.game_state.away_score - self.game_state.home_score <= -3:
                     self.kick_field_goal()
-                else: """
-                self.play_from_scrimmage()
+                else: 
+                    self.play_from_scrimmage()
             elif self.game_state.down_counter == 4:
                 self.play_fourth_down()
             elif self.game_state.down == "PAT":
@@ -96,12 +97,12 @@ class DiceGame(GameSimulator):
             if turtle != None:
                 erase_game_state(self.game_state, turtle)
 if __name__ == '__main__':
-    t, screen = draw_field()
-    mn, gb = Team("Minnesota"), Team("Green Bay", "GB")
-    game = DiceGame(mn, gb, dice_number = 2, offensive_dice_faces=12, defensive_dice_faces=8)
+    home, away = Team("Kansas City", "KC", mascot="Chiefs", color="red"), Team("Philiadelphia", "PHI", mascot="Eagles", color="darkgreen")
+    t, screen = draw_field(home, away)
+    game = DiceGame(home, away, dice_number = 2, offensive_dice_faces=12, defensive_dice_faces=8)
     game.simulate_game(1, t)
     print(game.game_state)
-    print(gb.yards_for, gb.yards_allowed, mn.yards_for, mn.yards_allowed)
+    print(away.yards_for, away.yards_allowed, home.yards_for, home.yards_allowed)
 
 
 

@@ -2,6 +2,7 @@ from game_state import GameState
 from team import Team
 import csv
 from dice_game import DiceGame
+from game_simulator import GameSimulator
 import numpy as np
 
 def load_teams_from_csv(filepath = "data/nfl_teams.csv"):
@@ -15,7 +16,7 @@ def load_teams_from_csv(filepath = "data/nfl_teams.csv"):
         return teams_list
 
 class League:
-    def __init__(self, teams = load_teams_from_csv(), simulator = DiceGame):
+    def __init__(self, teams = load_teams_from_csv(), simulator: GameSimulator = DiceGame):
         self.teams = teams
         self.conferences = list(set([team.conference for team in self.teams]))
         self.divisions = list(set([team.conference + " " + team.division for team in self.teams]))

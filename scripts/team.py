@@ -1,7 +1,7 @@
 
 
 class Team:
-    def __init__(self, team_name, abbreviation = None, mascot = None, division = None, conference = None):
+    def __init__(self, team_name, abbreviation = None, mascot = None, division = None, conference = None, color = "white"):
         self.team_name = team_name
         if abbreviation == None:
             self.abbreviation = self.team_name[:3].upper()
@@ -19,5 +19,6 @@ class Team:
         self.yards_allowed = []
         self.division = division
         self.conference = conference
+        self.color = color
     def __repr__(self):
         return str(self.team_name)
