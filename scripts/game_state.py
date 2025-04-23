@@ -38,12 +38,12 @@ class GameState:
             return self.yard_line
     def __repr__(self):
         if self.down != "kickoff":
-            return (str(self.away_team) + " " + str(self.away_score) + " " + str(self.home_team) + " " + str(self.home_score) + "\n"
-                        + str(self.team_with_possession) + " ball at the " + self.describe_yard_line() + " " + self.down + " and " + str(self.distance)
+            return (str(self.away_team.team_name) + " " + str(self.away_score) + " " + str(self.home_team.team_name) + " " + str(self.home_score) + "\n"
+                        + str(self.team_with_possession.team_name) + " ball at the " + self.describe_yard_line() + " " + self.down + " and " + str(self.distance)
                         + "\n" + str(self.time_remaining) + " in quarter " + str(self.current_quarter))
         else:
-            return (str(self.away_team) + " " + str(self.away_score) + " " + str(self.home_team) + " " + str(self.home_score) + "\n"
-                        + str(self.team_with_possession) + " kickoff from the " + self.describe_yard_line()
+            return (str(self.away_team.team_name) + " " + str(self.away_score) + " " + str(self.home_team.team_name) + " " + str(self.home_score) + "\n"
+                        + str(self.team_with_possession.team_name) + " kickoff from the " + self.describe_yard_line()
                         + "\n" + str(self.time_remaining) + " in quarter " + str(self.current_quarter))
     def switch_possession(self):
         teams = [self.home_team, self.away_team]
@@ -52,6 +52,10 @@ class GameState:
         self.down_counter = 1
         self.down = "1st"
         self.distance = 10
+    def get_team_without_possession(self):
+        if self.team_with_possession == self.home_team:
+            return self.home_team
+        return self.away_team
     def set_to_kickoff(self):
         self.yard_line = 35
         if self.team_with_possession == self.away_team:

@@ -1,9 +1,12 @@
 from game_state import GameState
 from team import Team
+from rated_players_team import RatedPlayersTeam
 import csv
 from dice_game import DiceGame
 from game_simulator import GameSimulator
+from rated_players_simulator import RatedPlayersSimulator
 import numpy as np
+import random
 
 def load_teams_from_csv(filepath = "data/nfl_teams.csv"):
     with open(filepath) as fp:
@@ -13,6 +16,18 @@ def load_teams_from_csv(filepath = "data/nfl_teams.csv"):
             team_name = " ".join(row["Name"].split(" ")[:-1])
             team_mascot = row["Name"].split(" ")[-1]
             teams_list.append(Team(team_name, row["Abbreviation"], team_mascot, row["Division"], row["Conference"]))
+        return teams_list
+def load_rated_teams_from_csv(filepath = "data/nfl_teams.csv"):
+    with open(filepath) as fp:
+        team_data = csv.DictReader(fp)
+        teams_list = []
+        for row in team_data:
+            team_name = " ".join(row["Name"].split(" ")[:-1])
+            team_mascot = row["Name"].split(" ")[-1]
+            cur_team = RatedPlayersTeam(team_name, row["Abbreviation"], team_mascot, row["Division"], row["Conference"])
+            cur_team.generate_random_players(None, random.randint(3, 7), random.randint(3, 7))
+            teams_list.append(cur_team)
+
         return teams_list
 
 class League:
@@ -41,9 +56,9 @@ class League:
 
 
 if __name__ == '__main__':
-    teams = load_teams_from_csv()
+    teams = load_rated_teams_from_csv()
     for team in teams:
         print(team)
-    league = League(teams)
+    league = League(teams, RatedPlayersSimulator)
     league.play_round_robin()
     league.list_records()

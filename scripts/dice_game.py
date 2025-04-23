@@ -75,7 +75,7 @@ class DiceGame(GameSimulator):
     def kick_pat(self):
         kick = random.randint(1, 10) > 1
         self.game_state.update_state(0, is_kick_good=kick)
-    def simulate_game(self, turn_time = 0, turtle = None):
+    def simulate_game(self, turn_time = 0, turtle = None, advance_on_click = False):
         while not self.game_state.game_is_over:
             if self.game_state.down == "kickoff":
                 self.kickoff()
