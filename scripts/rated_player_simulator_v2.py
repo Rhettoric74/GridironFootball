@@ -5,6 +5,7 @@ import game_state
 from turtle_graphics import draw_game_state, erase_game_state, draw_field
 import time
 import numpy as np
+from playcall_classifier import decide_next_play
 
 TURNOVER_WEIGHT = 0.03
 TURNOVER_BASE_PROB = 0.016
@@ -73,6 +74,8 @@ class RatedPlayersSimulator(GameSimulator):
         self.game_state.update_state(0, is_kick_good=kick)
     def simulate_game(self, turn_time = 0, turtle = None):
         while not self.game_state.game_is_over:
+            play_call = decide_next_play(self.game_state.get_state_vector())
+            print(play_call)
             if self.game_state.down == "kickoff":
                 self.kickoff()
             elif self.game_state.down_counter in [1, 2, 3]:
@@ -100,6 +103,6 @@ if __name__ == '__main__':
     print(away.get_team_overall())
     game = RatedPlayersSimulator(home, away)
     t, screen = draw_field(home, away)
-    game.simulate_game(turn_time=0, turtle=t)
+    game.simulate_game(turn_time=1, turtle=t)
     print(game.game_state)
     print(away.yards_for, away.yards_allowed, home.yards_for, home.yards_allowed)

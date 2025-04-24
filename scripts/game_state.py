@@ -1,5 +1,6 @@
 from team import Team
 import random
+import pandas as pd
 
 downs_map = {1:"1st", 2:"2nd", 3:"3rd", 4:"4th"}
 # constant for how many yards from the line of scrimmage kickers kick from
@@ -247,6 +248,28 @@ class GameState:
             # decrement time remaining if it's not a point after attempt
             # and the quarter is not over.
             self.time_remaining -= time_elapsed
+
+    def get_state_vector(self, posteam_mapping = {"home": 0, "away": 1}):
+        """describe game state as a vector with columns as follows: ['posteam_type', 'yardline_100', 'quarter_seconds_remaining', 'down',
+       'half_seconds_remaining', 'game_seconds_remaining', 'goal_to_go',
+       'ydstogo', 'score_differential']"""
+        posteam = posteam_mapping["away"]
+        if self.team_with_possession == self.home_team:
+            posteam = posteam_mapping["home"]
+        quarter_seconds_remaining = self.time_remaining * 60
+        game_seconds_remaining = max(0, (4 - self.current_quarter)) * 15 * 60 + quarter_seconds_remaining
+        half_seconds_remaining = game_seconds_remaining % (30 * 60)
+        goal_to_go = 0
+        if self.yards_to_goal() <= self.distance:
+            self.goal_to_go = 1
+        score_differential = self.home_score - self.away_score
+        if self.team_with_possession == self.away_team:
+            score_differential = - score_differential
+        sample = pd.DataFrame(columns=['posteam_type', 'yardline_100', 'quarter_seconds_remaining', 'down',
+            'half_seconds_remaining', 'game_seconds_remaining', 'goal_to_go',
+            'ydstogo', 'score_differential'])
+        sample.loc[0] = [posteam, self.yard_line, quarter_seconds_remaining, self.down_counter, half_seconds_remaining, game_seconds_remaining, goal_to_go, self.distance, score_differential]
+        return sample
     
 
 
