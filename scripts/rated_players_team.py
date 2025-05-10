@@ -2,10 +2,23 @@ from team import Team
 from rated_player import RatedPlayer, position_overview
 import numpy as np
 import random
+import math
 
 # 12 players is the basic number on offense and defense to account for different packages
 # e.g. 11 personel & 21 personel, base & nickel
 # four players are designated as special teams
+def pick_best_obfuscated_overall(prospects):
+    # function to draft the highest overall player based on obfuscated player ratings
+    best_overall_prospect = None
+    best_rating = - float("inf")
+    for prospect in prospects:
+        ratings = prospect.get_obfuscated_ratings()
+        overall = (ratings["consistency"] + ratings["explosiveness"]) / 2
+        if overall > best_rating:
+            best_rating = overall
+            best_overall_prospect = prospect
+    return best_overall_prospect
+
 RATING_VARIANCE = 1.5
 def generate_player_names(num_players = 28):
     male_first_names = []
@@ -21,9 +34,10 @@ def generate_player_names(num_players = 28):
     return [random.choice(male_first_names) +  " " + random.choice(last_names) for i in range(num_players)]
 
 class RatedPlayersTeam(Team):
-    def __init__(self, team_name, abbreviation = None, mascot = None, division = None, conference = None, color = "white"):
+    def __init__(self, team_name, abbreviation = None, mascot = None, division = None, conference = None, color = "white", draft_strategy = pick_best_obfuscated_overall):
         super().__init__(team_name, abbreviation, mascot, division, conference, color)
         self.players = []
+        self.draft_strategy = draft_strategy
     def add_player(self, player):
         self.players.append(player)
     def remove_player(self, player):
@@ -34,6 +48,15 @@ class RatedPlayersTeam(Team):
         return [player for player in self.players if player.subunit == subunit_name]
     def get_position_group(self, position_name):
         return [player for player in self.players if player.position == position_name]
+    
+    def get_defensive_front_seven(self):
+        return self.get_subunit("defensive_line") + self.get_subunit("linebackers")
+    def get_offensive_front_seven(self):
+        return self.get_subunit("offensive_line") + self.get_position_group("RB") + self.get_position_group("FB")
+    def get_defensive_back_seven(self):
+        return self.get_subunit("backs") + self.get_position_group("linebackers")
+    def get_offensive_skill_positions(self):
+        return self.get_subunit("pass_catchers") + self.get_position_group("QB")
     def avg_player_consistency(players_list):
         return np.mean([player.ratings["consistency"] for player in players_list])
     def avg_player_explosiveness(players_list):

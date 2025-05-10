@@ -14,29 +14,47 @@ years = [2020, 2021]
 #[print(col) for col in nfl.see_pbp_cols()]
 columns = ["play_id", "game_id", "posteam_type", "yardline_100", "quarter_seconds_remaining", "down", "half_seconds_remaining", "game_seconds_remaining", "goal_to_go", "ydstogo", "score_differential", "play_type"]
 data = nfl.import_pbp_data(years, columns)
-X = data[columns].drop(['play_id', 'game_id', 'play_type'], axis=1)
-y = data["play_type"]
+fourth_down_data = data[data["down"] == 4]
+print(len(fourth_down_data))
+print(data["down"].head(10))
+other_downs_data = data[data["down"].isin([1, 2, 3])]
+other_downs_X = other_downs_data[columns].drop(['play_id', 'game_id', 'play_type'], axis=1)
+other_downs_y = other_downs_data["play_type"]
 posession_le = LabelEncoder()
-X['posteam_type'] = posession_le.fit_transform(X['posteam_type'])
+other_downs_X['posteam_type'] = posession_le.fit_transform(other_downs_X['posteam_type'])
 class_le = LabelEncoder()
-y = class_le.fit_transform(y)
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=39)
+other_downs_y = class_le.fit_transform(other_downs_y)
+X_train, X_test, y_train, y_test = train_test_split(other_downs_X, other_downs_y, test_size=0.2, random_state=39)
 
 global rf
-rf = RandomForestClassifier(n_estimators=50)
+rf = RandomForestClassifier(n_estimators=100)
 rf.fit(X_train, y_train)
 predictions = rf.predict(X_test)
+
+fourth_down_X = fourth_down_data[columns].drop(['play_id', 'game_id', 'play_type'], axis=1)
+fourth_down_y = fourth_down_data["play_type"]
+fourth_down_X['posteam_type'] = posession_le.transform(fourth_down_X['posteam_type'])
+fourth_down_y = class_le.fit_transform(fourth_down_y)
+fourth_down_X_train, fourth_down_X_test, fourth_down_y_train, fourth_down_y_test = train_test_split(fourth_down_X, fourth_down_y, test_size=0.2, random_state=39)
+
+global fourth_down_rf
+fourth_down_rf = RandomForestClassifier(n_estimators=10)
+fourth_down_rf.fit(fourth_down_X_train, fourth_down_y_train)
+fourth_down_predictions = fourth_down_rf.predict(fourth_down_X_test)
 
 def decide_next_play(game_situation, classifier = rf, label_encoder = class_le):
     """Purpose: Decide what type of play to call next (i.e., run, pass, punt, field_goal, etc.) given a vector 
     representing the team with posession, yard line, down, distance, time remaining"""
-    return class_le.inverse_transform(classifier.predict(game_situation))[0]
+    return label_encoder.inverse_transform(classifier.predict(game_situation))[0]
+def decide_fourth_down(game_situation, classifier = fourth_down_rf, label_encoder = class_le):
+    return label_encoder.inverse_transform(classifier.predict(game_situation))[0]
 
 error_rate = len([i for i in range(len(predictions)) if predictions[i] != y_test[i]]) / len(y_test)
-run_pass_error_rate = len([i for i in range(len(predictions)) if (y_test[i] in class_le.transform(['pass', 'run'])) and y_test[i] != predictions[i]]) / len(y_test)
+fourth_down_error_rate = len([i for i in range(len(fourth_down_predictions)) if (fourth_down_y_test[i] in class_le.transform(['pass', 'run'])) and fourth_down_y_test[i] != fourth_down_predictions[i]]) / len(fourth_down_y_test)
 
 
-print("RF Error rate", error_rate, "RF Run-pass error rate:", run_pass_error_rate)
+print("RF Error rate", error_rate, "RF fourth down error rate:", fourth_down_error_rate)
+
 # Subsequent experimental classifiers are commented out because they did performed worse than RF.
 
 """

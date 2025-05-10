@@ -54,7 +54,7 @@ class GameState:
         self.down = "1st"
         self.distance = 10
     def get_team_without_possession(self):
-        if self.team_with_possession == self.home_team:
+        if self.team_with_possession == self.away_team:
             return self.home_team
         return self.away_team
     def set_to_kickoff(self):
@@ -268,7 +268,7 @@ class GameState:
         sample = pd.DataFrame(columns=['posteam_type', 'yardline_100', 'quarter_seconds_remaining', 'down',
             'half_seconds_remaining', 'game_seconds_remaining', 'goal_to_go',
             'ydstogo', 'score_differential'])
-        sample.loc[0] = [posteam, self.yard_line, quarter_seconds_remaining, self.down_counter, half_seconds_remaining, game_seconds_remaining, goal_to_go, self.distance, score_differential]
+        sample.loc[0] = [posteam, self.yards_to_goal(), quarter_seconds_remaining, self.down_counter, half_seconds_remaining, game_seconds_remaining, goal_to_go, self.distance, score_differential]
         return sample
     
 

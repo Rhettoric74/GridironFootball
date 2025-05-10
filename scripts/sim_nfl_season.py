@@ -4,7 +4,7 @@ from rated_players_team import RatedPlayersTeam
 import csv
 from dice_game import DiceGame
 from game_simulator import GameSimulator
-from rated_players_simulator import RatedPlayersSimulator
+from rated_players_simulator_v2 import RatedPlayersSimulatorV2
 import numpy as np
 import random
 
@@ -25,7 +25,7 @@ def load_rated_teams_from_csv(filepath = "data/nfl_teams.csv"):
             team_name = " ".join(row["Name"].split(" ")[:-1])
             team_mascot = row["Name"].split(" ")[-1]
             cur_team = RatedPlayersTeam(team_name, row["Abbreviation"], team_mascot, row["Division"], row["Conference"])
-            cur_team.generate_random_players(None, random.randint(3, 7), random.randint(3, 7))
+            cur_team.generate_random_players(None, random.normalvariate(5, 1.5), random.normalvariate(5, 1.5))
             teams_list.append(cur_team)
 
         return teams_list
@@ -59,6 +59,6 @@ if __name__ == '__main__':
     teams = load_rated_teams_from_csv()
     for team in teams:
         print(team)
-    league = League(teams, RatedPlayersSimulator)
+    league = League(teams, RatedPlayersSimulatorV2)
     league.play_round_robin()
     league.list_records()
